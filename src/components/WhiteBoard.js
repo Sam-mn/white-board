@@ -1,5 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
+import { FaComments } from "react-icons/fa";
+import ChatSection from "./ChatSection";
+
+const MainDiv = styled.div`
+    position: relative;
+`;
 
 const ColorsDiv = styled.div`
     padding: 0.5rem 0;
@@ -8,6 +14,7 @@ const ColorsDiv = styled.div`
     align-items: center;
     width: 100%;
     background-color: #565555;
+    position: absolute;
 `;
 
 const SizeDiv = styled.div`
@@ -17,20 +24,27 @@ const SizeDiv = styled.div`
     margin-right: 0.5rem;
 `;
 
+const IconDiv = styled.div`
+    position: absolute;
+    bottom: 3rem;
+    left: 1rem;
+    cursor: pointer;
+`;
+
 const WhiteBoard = () => {
     const canvasRef = useRef();
     const contextRef = useRef();
     const [isDrawing, setIsDrawing] = useState(false);
-    const [onlineUsers, setOnlineUsers] = useState([]);
     const [color, setColor] = useState("black");
     const [lineSize, setLineSize] = useState(1);
+    const [openChat, setOpenChat] = useState(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         canvas.width = window.innerWidth * 2;
         canvas.height = window.innerHeight * 2;
-        canvas.style.width = `${window.innerWidth}px`;
-        canvas.style.height = `${window.innerHeight}px`;
+        canvas.style.width = `100%`;
+        canvas.style.height = `100%`;
         const context = canvas.getContext("2d");
         context.scale(2, 2);
         context.lineCap = "round";
@@ -79,8 +93,12 @@ const WhiteBoard = () => {
         setLineSize(e.target.value);
     };
 
+    const handleOpenChat = () => {
+        setOpenChat(!openChat);
+    };
+
     return (
-        <div>
+        <MainDiv>
             <ColorsDiv className='colors'>
                 <SizeDiv>
                     <select name='size' id='size' onChange={handleOnChange}>
@@ -101,7 +119,11 @@ const WhiteBoard = () => {
                 ref={canvasRef}
                 id='board'
             />
-        </div>
+            {openChat && <ChatSection />}
+            <IconDiv onClick={handleOpenChat}>
+                <FaComments style={{ width: "2.5rem", height: "2.5rem" }} />
+            </IconDiv>
+        </MainDiv>
     );
 };
 
