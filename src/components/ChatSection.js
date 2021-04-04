@@ -1,6 +1,102 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FaUserAlt } from "react-icons/fa";
+import { useParams } from "react-router-dom";
+import socket from "../modules/socket-clint";
+
+const ChatSection = () => {
+    const [value, setValue] = useState("");
+    const { roomName } = useParams();
+
+    useEffect(() => {
+        console.log(roomName);
+    }, []);
+
+    const handleOnSubmit = (e) => {
+        e.preventDefault();
+        socket.emit("chat message", value);
+        setValue("");
+    };
+
+    return (
+        <MainDiv>
+            <ChatDiv>
+                <FirstDiv>
+                    <FaUserAlt />
+                    <UserMsg>
+                        <UserP>samer</UserP>
+                        <UserP>Hi</UserP>
+                    </UserMsg>
+                </FirstDiv>
+                <SecondDiv>
+                    <FaUserAlt />
+                    <OthersMsg>
+                        <OtherP>moe</OtherP>
+                        <OtherP>Hello</OtherP>
+                    </OthersMsg>
+                </SecondDiv>
+                <SecondDiv>
+                    <FaUserAlt />
+                    <OthersMsg>
+                        <OtherP>moe</OtherP>
+                        <OtherP>Hello</OtherP>
+                    </OthersMsg>
+                </SecondDiv>
+                <SecondDiv>
+                    <FaUserAlt />
+                    <OthersMsg>
+                        <OtherP>moe</OtherP>
+                        <OtherP>Hello</OtherP>
+                    </OthersMsg>
+                </SecondDiv>
+                <SecondDiv>
+                    <FaUserAlt />
+                    <OthersMsg>
+                        <OtherP>moe</OtherP>
+                        <OtherP>Hello</OtherP>
+                    </OthersMsg>
+                </SecondDiv>
+                <SecondDiv>
+                    <FaUserAlt />
+                    <OthersMsg>
+                        <OtherP>moe</OtherP>
+                        <OtherP>Hello</OtherP>
+                    </OthersMsg>
+                </SecondDiv>
+                <SecondDiv>
+                    <FaUserAlt />
+                    <OthersMsg>
+                        <OtherP>moe</OtherP>
+                        <OtherP>Hello</OtherP>
+                    </OthersMsg>
+                </SecondDiv>
+                <SecondDiv>
+                    <FaUserAlt />
+                    <OthersMsg>
+                        <OtherP>moe</OtherP>
+                        <OtherP>Hello</OtherP>
+                    </OthersMsg>
+                </SecondDiv>
+                <SecondDiv>
+                    <FaUserAlt />
+                    <OthersMsg>
+                        <OtherP>moe</OtherP>
+                        <OtherP>Hello</OtherP>
+                    </OthersMsg>
+                </SecondDiv>
+            </ChatDiv>
+            <Form onSubmit={handleOnSubmit}>
+                <Input
+                    type='text'
+                    value={value ? value : ""}
+                    onChange={(e) => setValue(e.target.value)}
+                />
+            </Form>
+        </MainDiv>
+    );
+};
+
+export default ChatSection;
 
 const MainDiv = styled.div`
     position: absolute;
@@ -80,87 +176,3 @@ const ChatDiv = styled.div`
     height: 90%;
     overflow: scroll;
 `;
-
-const ChatSection = () => {
-    const [value, setValue] = useState("");
-
-    const handleOnSubmit = (e) => {
-        e.preventDefault();
-        console.log(value);
-    };
-
-    return (
-        <MainDiv>
-            <ChatDiv>
-                <FirstDiv>
-                    <FaUserAlt />
-                    <UserMsg>
-                        <UserP>samer</UserP>
-                        <UserP>Hi</UserP>
-                    </UserMsg>
-                </FirstDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-            </ChatDiv>
-            <Form onSubmit={handleOnSubmit}>
-                <Input type='text' onChange={(e) => setValue(e.target.value)} />
-            </Form>
-        </MainDiv>
-    );
-};
-
-export default ChatSection;

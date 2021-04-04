@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node ./server",
+    "start": "nodemon ./server",
     "dev": "DEBUG=whiteboard:* nodemon --inspect ./server"
   },
   "dependencies": {

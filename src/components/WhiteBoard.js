@@ -3,34 +3,6 @@ import styled from "styled-components";
 import { FaComments } from "react-icons/fa";
 import ChatSection from "./ChatSection";
 
-const MainDiv = styled.div`
-    position: relative;
-`;
-
-const ColorsDiv = styled.div`
-    padding: 0.5rem 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    background-color: #565555;
-    position: absolute;
-`;
-
-const SizeDiv = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 0.5rem;
-`;
-
-const IconDiv = styled.div`
-    position: absolute;
-    bottom: 3rem;
-    left: 1rem;
-    cursor: pointer;
-`;
-
 const WhiteBoard = () => {
     const canvasRef = useRef();
     const contextRef = useRef();
@@ -128,3 +100,31 @@ const WhiteBoard = () => {
 };
 
 export default WhiteBoard;
+
+const MainDiv = styled.div`
+    position: relative;
+`;
+
+const ColorsDiv = styled.div`
+    padding: 0.5rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: #565555;
+    position: absolute;
+`;
+
+const SizeDiv = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 0.5rem;
+`;
+
+const IconDiv = styled.div`
+    position: absolute;
+    bottom: 3rem;
+    left: 1rem;
+    cursor: pointer;
+`;

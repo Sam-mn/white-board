@@ -1,11 +1,40 @@
+import { useEffect } from "react";
 import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import WhiteBoard from "./components/WhiteBoard";
+import Login from "./components/Login";
+import Room from "./components/Room";
+import socket from "./modules/socket-clint";
 
 function App() {
+    useEffect(() => {
+        socket.on("connection", (data) => {
+            console.log("connected to socket server" + data);
+        });
+
+        return () => {
+            console.log("Will disconnect from socket-server now...");
+            socket.removeAllListeners();
+            socket.disconnect();
+        };
+    }, []);
+
     return (
-        <div className='App'>
-            <WhiteBoard />
-        </div>
+        <Router>
+            <div className='App'>
+                <Routes>
+                    <Route path='/'>
+                        <Login />
+                    </Route>
+                    <Route path='/room'>
+                        <Room />
+                    </Route>
+                    <Route path='/Whiteboard/:roomName'>
+                        <WhiteBoard />
+                    </Route>
+                </Routes>
+            </div>
+        </Router>
     );
 }
 
