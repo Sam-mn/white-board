@@ -2,6 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import { FaComments } from "react-icons/fa";
 import ChatSection from "./ChatSection";
+import socket from "../modules/socket-clint";
+import { Button } from "react-bootstrap";
 
 const WhiteBoard = () => {
     const canvasRef = useRef();
@@ -10,6 +12,8 @@ const WhiteBoard = () => {
     const [color, setColor] = useState("black");
     const [lineSize, setLineSize] = useState(1);
     const [openChat, setOpenChat] = useState(false);
+    const [messages, setMessages] = useState([]);
+    const [message, setMessage] = useState("");
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -34,6 +38,12 @@ const WhiteBoard = () => {
         const context = canvas.getContext("2d");
         context.lineWidth = lineSize;
     }, [lineSize]);
+
+    useEffect(() => {
+        socket.on("message", (message) => {
+            setMessages([...messages, message]);
+        });
+    }, [messages]);
 
     const startDraw = ({ nativeEvent }) => {
         const { offsetX, offsetY } = nativeEvent;
@@ -83,6 +93,7 @@ const WhiteBoard = () => {
                     </select>
                 </SizeDiv>
                 <input type='color' onChange={handleChangeColor} />
+                <Button>Leave</Button>
             </ColorsDiv>
             <canvas
                 onMouseDown={startDraw}
@@ -91,7 +102,14 @@ const WhiteBoard = () => {
                 ref={canvasRef}
                 id='board'
             />
-            {openChat && <ChatSection />}
+            {openChat && (
+                <ChatSection
+                    setMessages={setMessages}
+                    setMessage={setMessage}
+                    message={message}
+                    messages={messages}
+                />
+            )}
             <IconDiv onClick={handleOpenChat}>
                 <FaComments style={{ width: "2.5rem", height: "2.5rem" }} />
             </IconDiv>

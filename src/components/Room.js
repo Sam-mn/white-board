@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { InputGroup, Button, FormControl } from "react-bootstrap";
 import styled from "styled-components";
 import socket from "../modules/socket-clint";
@@ -9,6 +9,7 @@ const Room = () => {
     const [roomList, setRoomList] = useState([]);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const { name } = useParams();
 
     const handleOnChange = (e) => {
         setError(null);
@@ -23,15 +24,16 @@ const Room = () => {
             return;
         }
 
-        socket.emit("join", { roomName }, (data) => {
-            setRoomList(data);
+        socket.emit("join", { name, roomName }, (data) => {
+            // setRoomList(data);
+            // console.log(data);
         });
 
-        navigate(`/whiteboard/${roomName}`);
+        navigate(`/whiteboard/${name}/${roomName}`);
     };
 
     const handleJoinRoom = (e, room) => {
-        navigate(`/whiteboard/${room}`);
+        navigate(`/whiteboard/${name}/${room}`);
     };
 
     return (

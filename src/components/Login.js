@@ -21,7 +21,7 @@ const Login = () => {
             return;
         }
         socket.emit("user-name", { name });
-        navigate("/room");
+        navigate(`/room/${name}`);
     };
 
     return (

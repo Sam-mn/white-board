@@ -16,6 +16,7 @@ function App() {
             console.log("Will disconnect from socket-server now...");
             socket.removeAllListeners();
             socket.disconnect();
+            socket.off();
         };
     }, []);
 
@@ -26,10 +27,10 @@ function App() {
                     <Route path='/'>
                         <Login />
                     </Route>
-                    <Route path='/room'>
+                    <Route path='/room/:name'>
                         <Room />
                     </Route>
-                    <Route path='/Whiteboard/:roomName'>
+                    <Route path='/Whiteboard/:name/:roomName'>
                         <WhiteBoard />
                     </Route>
                 </Routes>

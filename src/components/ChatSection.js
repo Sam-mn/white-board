@@ -3,93 +3,60 @@ import styled from "styled-components";
 import { FaUserAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import socket from "../modules/socket-clint";
+import ScrollToBottom from "react-scroll-to-bottom";
+import ReactEmoji from "react-emoji";
 
-const ChatSection = () => {
-    const [value, setValue] = useState("");
-    const { roomName } = useParams();
+const ChatSection = ({ setMessages, setMessage, message, messages }) => {
+    const { name, roomName } = useParams();
 
     useEffect(() => {
-        console.log(roomName);
-    }, []);
+        socket.on("message", (message) => {
+            setMessages([...messages, message]);
+        });
+    }, [messages]);
 
     const handleOnSubmit = (e) => {
         e.preventDefault();
-        socket.emit("chat message", value);
-        setValue("");
+
+        if (message) {
+            socket.emit("sendMessage", message, () => setMessage(""));
+        }
     };
 
     return (
         <MainDiv>
             <ChatDiv>
-                <FirstDiv>
-                    <FaUserAlt />
-                    <UserMsg>
-                        <UserP>samer</UserP>
-                        <UserP>Hi</UserP>
-                    </UserMsg>
-                </FirstDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
-                <SecondDiv>
-                    <FaUserAlt />
-                    <OthersMsg>
-                        <OtherP>moe</OtherP>
-                        <OtherP>Hello</OtherP>
-                    </OthersMsg>
-                </SecondDiv>
+                {messages?.map((m, i) => {
+                    if (m.user === name) {
+                        return (
+                            <FirstDiv key={i}>
+                                <FaUserAlt />
+                                <UserMsg>
+                                    <UserP>{m.user}</UserP>
+                                    <UserP>{m.text}</UserP>
+                                </UserMsg>
+                            </FirstDiv>
+                        );
+                    } else {
+                        return (
+                            <SecondDiv key={i}>
+                                <FaUserAlt />
+                                <OthersMsg>
+                                    <OtherP>{m.user}</OtherP>
+                                    <OtherP>{m.text}</OtherP>
+                                </OthersMsg>
+                            </SecondDiv>
+                        );
+                    }
+                })}
             </ChatDiv>
             <Form onSubmit={handleOnSubmit}>
                 <Input
                     type='text'
-                    value={value ? value : ""}
-                    onChange={(e) => setValue(e.target.value)}
+                    value={message ? message : ""}
+                    required
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder='Write some thing...'
                 />
             </Form>
         </MainDiv>
