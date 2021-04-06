@@ -5,6 +5,12 @@ const userName = (data) => {
     console.log(data);
 };
 
+const rooms = [
+    { name: "first room", users: [] },
+    { name: "second room", users: [] },
+    { name: "third room", users: [] },
+];
+
 function handleJoinRoom({ name, roomName }, callback) {
     const user = addUser({
         id: this.id,
@@ -65,12 +71,10 @@ module.exports = function (socket) {
 
         socket.join(user.room);
 
-        socket
-            .to(user.name)
-            .emit("roomData", {
-                room: user.room,
-                users: getUserInRoom(user.room),
-            });
+        socket.to(user.name).emit("roomData", {
+            room: user.room,
+            users: getUserInRoom(user.room),
+        });
 
         callback();
     });
@@ -90,6 +94,7 @@ module.exports = function (socket) {
     socket.on("disconnect", () => {
         console.log(`Client ${socket.id} had left`);
         const user = removeUser(socket.id);
+
         if (user) {
             socket.to(user.room).emit("message", {
                 user: "admin",

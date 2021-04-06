@@ -33,6 +33,10 @@ const Room = () => {
     };
 
     const handleJoinRoom = (e, room) => {
+        socket.emit("join", { name, room }, (data) => {
+            // setRoomList(data);
+            // console.log(data);
+        });
         navigate(`/whiteboard/${name}/${room}`);
     };
 

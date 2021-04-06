@@ -4,6 +4,7 @@ import { FaComments } from "react-icons/fa";
 import ChatSection from "./ChatSection";
 import socket from "../modules/socket-clint";
 import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const WhiteBoard = () => {
     const canvasRef = useRef();
@@ -14,6 +15,8 @@ const WhiteBoard = () => {
     const [openChat, setOpenChat] = useState(false);
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
+    const [users, setUsers] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -44,6 +47,12 @@ const WhiteBoard = () => {
             setMessages([...messages, message]);
         });
     }, [messages]);
+
+    useEffect(() => {
+        socket.on("roomData", (data) => {
+            setUsers([...users, data]);
+        });
+    }, [users]);
 
     const startDraw = ({ nativeEvent }) => {
         const { offsetX, offsetY } = nativeEvent;
@@ -79,6 +88,11 @@ const WhiteBoard = () => {
         setOpenChat(!openChat);
     };
 
+    const handleOnLeave = () => {
+        socket.emit("disconnect");
+        navigate("/");
+    };
+
     return (
         <MainDiv>
             <ColorsDiv className='colors'>
@@ -93,7 +107,7 @@ const WhiteBoard = () => {
                     </select>
                 </SizeDiv>
                 <input type='color' onChange={handleChangeColor} />
-                <Button>Leave</Button>
+                <Button onClick={handleOnLeave}>Leave</Button>
             </ColorsDiv>
             <canvas
                 onMouseDown={startDraw}
