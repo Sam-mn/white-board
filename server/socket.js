@@ -6,41 +6,63 @@ const userName = (data) => {
 };
 
 const rooms = [
-    { name: "first room", users: [] },
-    { name: "second room", users: [] },
-    { name: "third room", users: [] },
+    {
+        name: "general",
+        users: {},
+    },
+    {
+        name: "lieutenant",
+        users: {},
+    },
+    {
+        name: "private",
+        users: {},
+    },
 ];
 
-function handleJoinRoom({ name, roomName }, callback) {
-    const user = addUser({
-        id: this.id,
-        name,
-        room: roomName,
-    });
+const users = {};
 
-    if (user.error) return callback("error");
-
-    this.emit("message", {
-        user: "admin",
-        text: `${user.name} Welcome to the room ${user.room}`,
-    });
-
-    this.broadcast.to(user.room).emit("message", {
-        user: "admin",
-        text: `${user.name} has joined`,
-    });
-
-    this.join(user.roomName);
-
-    callback();
+/**
+ * Get room names
+ */
+function getListOfRoomNames() {
+    return rooms.map((room) => room.name);
 }
 
-function handleSendMessage(message, callback) {
-    const user = getUser(this.id);
-    console.log(user, message);
+/**
+ * Get usernames of online users in room
+ */
+function getOnlineUsersInRoom(room) {
+    return Object.values(room.users);
+}
 
-    this.to(user.room).emit("message", { user: user.name, text: message });
-    callback();
+/**
+ * Get room by roomName
+ */
+function getRoomByName(roomName) {
+    return rooms.find((room) => room.name === roomName);
+}
+
+/**
+ * Get username by id
+ */
+function getUsernameById(id) {
+    const room = getRoomByUserId(id);
+    return room.users[id];
+}
+
+/**
+ * Get room by user id
+ */
+function getRoomByUserId(id) {
+    return rooms.find((room) => room.users.hasOwnProperty(id));
+}
+
+/**
+ * Handle a request for rooms
+ */
+function handleGetRoomList(callback) {
+    callback(getListOfRoomNames());
 }
 
 module.exports = function (socket) {
@@ -48,7 +70,13 @@ module.exports = function (socket) {
     io = this;
     console.log(`Client ${socket.id} connected!`);
 
-    socket.on("user-name", userName);
+    socket.on(
+        "user-name",
+        (userName,
+        () => {
+            io.emit("roomList", { rooms });
+        })
+    );
 
     socket.on("join", ({ name, roomName }, callback) => {
         const user = addUser({
@@ -71,25 +99,37 @@ module.exports = function (socket) {
 
         socket.join(user.room);
 
-        socket.to(user.name).emit("roomData", {
-            room: user.room,
+        const existingRoom = rooms.find((room) => room.name === user.room);
+
+        if (!existingRoom) {
+            rooms.push({ name: user.room, users: {} });
+        }
+
+        // send the updated waiting list to all other users in the room
+        socket.broadcast.to(user.room).emit("updated-waiting-list", {
             users: getUserInRoom(user.room),
         });
 
-        callback();
+        // send the updated waiting list to all other users in the room
+        io.emit("updated-rooms", {
+            rooms,
+        });
+
+        callback({
+            joinChat: true,
+            usernameInUse: false,
+            onlineUsers: getUserInRoom(user.room),
+        });
     });
 
     socket.on("sendMessage", (message, callback) => {
         const user = getUser(socket.id);
 
         io.to(user.room).emit("message", { user: user.name, text: message });
-        io.to(user.room).emit("roomData", {
-            room: user.room,
-            users: getUserInRoom(user.room),
-        });
-
         callback();
     });
+
+    io.emit("roomList", { rooms });
 
     socket.on("disconnect", () => {
         console.log(`Client ${socket.id} had left`);

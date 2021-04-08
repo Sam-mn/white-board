@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { FaUserAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import socket from "../modules/socket-clint";
-import ScrollToBottom from "react-scroll-to-bottom";
-import ReactEmoji from "react-emoji";
 
 const ChatSection = ({ setMessages, setMessage, message, messages }) => {
-    const { name, roomName } = useParams();
+    const { name } = useParams();
 
     useEffect(() => {
         socket.on("message", (message) => {

@@ -16,6 +16,20 @@ const Room = () => {
         setRoomName(e.target.value);
     };
 
+    useEffect(() => {
+        socket.on("roomList", (data) => {
+            setRoomList(data.rooms);
+            console.log(data);
+        });
+    }, [roomList]);
+
+    useEffect(() => {
+        socket.on("updated-rooms", (data) => {
+            setRoomList(data.rooms);
+            console.log(data);
+        });
+    }, [roomList]);
+
     const handleOnSubmit = (e) => {
         e.preventDefault();
         console.log("hello");
@@ -32,12 +46,12 @@ const Room = () => {
         navigate(`/whiteboard/${name}/${roomName}`);
     };
 
-    const handleJoinRoom = (e, room) => {
-        socket.emit("join", { name, room }, (data) => {
+    const handleJoinRoom = (e, roomName) => {
+        socket.emit("join", { name, roomName }, (data) => {
             // setRoomList(data);
-            // console.log(data);
+            console.log("join", data);
         });
-        navigate(`/whiteboard/${name}/${room}`);
+        navigate(`/whiteboard/${name}/${roomName}`);
     };
 
     return (
@@ -64,10 +78,12 @@ const Room = () => {
                     roomList.map((room, i) => {
                         return (
                             <Li key={i}>
-                                <span>{room}</span>
+                                <span>{room.name}</span>
                                 <Button
                                     variant='success'
-                                    onClick={(e) => handleJoinRoom(e, room)}
+                                    onClick={(e) =>
+                                        handleJoinRoom(e, room.name)
+                                    }
                                 >
                                     Join
                                 </Button>
@@ -130,6 +146,7 @@ const Li = styled.li`
     border-bottom: 1px solid;
     align-items: center;
 `;
+
 // const Input = styled.input`
 //     width: 100%;
 //     &:focus {

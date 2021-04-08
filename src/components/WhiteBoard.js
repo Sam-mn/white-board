@@ -49,10 +49,10 @@ const WhiteBoard = () => {
     }, [messages]);
 
     useEffect(() => {
-        socket.on("roomData", (data) => {
-            setUsers([...users, data]);
+        socket.on("updated-waiting-list", (data) => {
+            console.log("Got updated waiting list from server:", data);
         });
-    }, [users]);
+    }, []);
 
     const startDraw = ({ nativeEvent }) => {
         const { offsetX, offsetY } = nativeEvent;
