@@ -1,10 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
-import { FaComments } from "react-icons/fa";
+import { FaComments, FaUsers } from "react-icons/fa";
 import ChatSection from "./ChatSection";
 import socket from "../modules/socket-clint";
 import { Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import OnlineUsersSection from "./OnlineUsersSection";
 
 const WhiteBoard = () => {
     const canvasRef = useRef();
@@ -13,9 +14,11 @@ const WhiteBoard = () => {
     const [color, setColor] = useState("black");
     const [lineSize, setLineSize] = useState(1);
     const [openChat, setOpenChat] = useState(false);
+    const [openOnlineUsers, setOpenOnlineUsers] = useState(false);
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
     const [users, setUsers] = useState([]);
+    const { roomName } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -49,6 +52,18 @@ const WhiteBoard = () => {
     }, [messages]);
 
     useEffect(() => {
+        socket.on("canvas-data", (data) => {
+            let image = new Image();
+            const canvas = document.querySelector("#board");
+            const context = canvas.getContext("2d");
+            image.onload = () => {
+                context.drawImage(image, 0, 0);
+            };
+            image.src = data;
+        });
+    }, [isDrawing]);
+
+    useEffect(() => {
         socket.on("updated-waiting-list", (data) => {
             console.log("Got updated waiting list from server:", data);
         });
@@ -73,7 +88,9 @@ const WhiteBoard = () => {
         const { offsetX, offsetY } = e.nativeEvent;
         contextRef.current.lineTo(offsetX, offsetY);
         contextRef.current.stroke();
-        const data = canvasRef.current.toDataURL("image/png");
+        const data = canvasRef.current.toDataURL(("image/jpeg", 0.5));
+        socket.emit("canvas-data", { data, room: roomName });
+        console.log(data);
     };
 
     const handleChangeColor = (e) => {
@@ -86,11 +103,20 @@ const WhiteBoard = () => {
 
     const handleOpenChat = () => {
         setOpenChat(!openChat);
+        setOpenOnlineUsers(false);
     };
 
     const handleOnLeave = () => {
         socket.emit("disconnect");
         navigate("/");
+    };
+
+    const handleOnlineUsers = () => {
+        setOpenOnlineUsers(!openOnlineUsers);
+        setOpenChat(false);
+        socket.emit("getUsers", { room: roomName }, (data) => {
+            setUsers(data);
+        });
     };
 
     return (
@@ -124,9 +150,16 @@ const WhiteBoard = () => {
                     messages={messages}
                 />
             )}
-            <IconDiv onClick={handleOpenChat}>
-                <FaComments style={{ width: "2.5rem", height: "2.5rem" }} />
-            </IconDiv>
+
+            {openOnlineUsers && <OnlineUsersSection users={users} />}
+            <FlexDiv>
+                <IconDiv onClick={handleOpenChat}>
+                    <FaComments style={{ width: "2.5rem", height: "2.5rem" }} />
+                </IconDiv>
+                <UsersIconDiv onClick={() => handleOnlineUsers()}>
+                    <FaUsers style={{ width: "2.5rem", height: "2.5rem" }} />
+                </UsersIconDiv>
+            </FlexDiv>
         </MainDiv>
     );
 };
@@ -154,7 +187,14 @@ const SizeDiv = styled.div`
     margin-right: 0.5rem;
 `;
 
-const IconDiv = styled.div`
+const IconDiv = styled.div``;
+
+const UsersIconDiv = styled.div`
+    margin-left: 1rem;
+`;
+
+const FlexDiv = styled.div`
+    display: flex;
     position: absolute;
     bottom: 3rem;
     left: 1rem;

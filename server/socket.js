@@ -115,6 +115,8 @@ module.exports = function (socket) {
             rooms,
         });
 
+        io.to(user.room).emit("getOnlineUser", { users: getUserInRoom() });
+
         callback({
             joinChat: true,
             usernameInUse: false,
@@ -131,6 +133,11 @@ module.exports = function (socket) {
 
     io.emit("roomList", { rooms });
 
+    socket.on("getUsers", (data, callback) => {
+        console.log(data);
+        callback({ users: getUserInRoom(data.room) });
+    });
+
     socket.on("disconnect", () => {
         console.log(`Client ${socket.id} had left`);
         const user = removeUser(socket.id);
@@ -141,5 +148,9 @@ module.exports = function (socket) {
                 text: `${user.name} has left`,
             });
         }
+    });
+
+    socket.on("canvas-data", (data) => {
+        socket.broadcast.to(data.room).emit("canvas-data", data.data);
     });
 };

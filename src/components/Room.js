@@ -19,20 +19,18 @@ const Room = () => {
     useEffect(() => {
         socket.on("roomList", (data) => {
             setRoomList(data.rooms);
-            console.log(data);
         });
     }, [roomList]);
 
     useEffect(() => {
         socket.on("updated-rooms", (data) => {
             setRoomList(data.rooms);
-            console.log(data);
         });
     }, [roomList]);
 
     const handleOnSubmit = (e) => {
         e.preventDefault();
-        console.log("hello");
+
         if (!roomName) {
             setError("Chose a room name to continue");
             return;
@@ -49,7 +47,7 @@ const Room = () => {
     const handleJoinRoom = (e, roomName) => {
         socket.emit("join", { name, roomName }, (data) => {
             // setRoomList(data);
-            console.log("join", data);
+            // console.log("join", data);
         });
         navigate(`/whiteboard/${name}/${roomName}`);
     };
