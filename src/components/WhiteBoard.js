@@ -10,7 +10,7 @@ import OnlineUsersSection from "./OnlineUsersSection";
 const WhiteBoard = () => {
     const canvasRef = useRef();
     const contextRef = useRef();
-    const [isDrawing, setIsDrawing] = useState(false);
+    const [isDrawing, setIsDrawing] = useState(true);
     const [color, setColor] = useState("black");
     const [lineSize, setLineSize] = useState(1);
     const [openChat, setOpenChat] = useState(false);
@@ -20,17 +20,69 @@ const WhiteBoard = () => {
     const [users, setUsers] = useState([]);
     const { roomName } = useParams();
     const navigate = useNavigate();
+    let timeout;
+
+    const drawOnCanvas = function () {
+        const canvas = document.querySelector("#board");
+        const ctx = canvas.getContext("2d");
+        const sketch = document.querySelector("#sketch");
+        const sketch_style = getComputedStyle(sketch);
+        canvas.width = parseInt(sketch_style.getPropertyValue("width"));
+        canvas.height = parseInt(sketch_style.getPropertyValue("height"));
+        const mouse = { x: 0, y: 0 };
+        const last_mouse = { x: 0, y: 0 };
+        /* Mouse Capturing Work */
+        canvas.addEventListener(
+            "mousemove",
+            function (e) {
+                last_mouse.x = mouse.x;
+                last_mouse.y = mouse.y;
+
+                mouse.x = e.pageX - this.offsetLeft;
+                mouse.y = e.pageY - this.offsetTop;
+            },
+            false
+        );
+        /* Drawing on Paint App */
+        ctx.lineWidth = 5;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "blue";
+
+        canvas.addEventListener(
+            "mousedown",
+            function (e) {
+                canvas.addEventListener("mousemove", onPaint, false);
+            },
+            false
+        );
+
+        canvas.addEventListener(
+            "mouseup",
+            function () {
+                canvas.removeEventListener("mousemove", onPaint, false);
+            },
+            false
+        );
+
+        console.log(this);
+        let root = {};
+        const onPaint = function () {
+            ctx.beginPath();
+            ctx.moveTo(last_mouse.x, last_mouse.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.closePath();
+            ctx.stroke();
+            if (root.timeout != undefined) clearTimeout(root.timeout);
+            root.timeout = setTimeout(function () {
+                const data = canvas.toDataURL("image/png");
+                socket.emit("canvas-data", { data, room: roomName });
+            }, 1000);
+        };
+    };
 
     useEffect(() => {
-        const canvas = canvasRef.current;
-        canvas.width = window.innerWidth * 2;
-        canvas.height = window.innerHeight * 2;
-        canvas.style.width = `100%`;
-        canvas.style.height = `100%`;
-        const context = canvas.getContext("2d");
-        context.scale(2, 2);
-        context.lineCap = "round";
-        contextRef.current = context;
+        drawOnCanvas();
     }, []);
 
     useEffect(() => {
@@ -68,30 +120,6 @@ const WhiteBoard = () => {
             console.log("Got updated waiting list from server:", data);
         });
     }, []);
-
-    const startDraw = ({ nativeEvent }) => {
-        const { offsetX, offsetY } = nativeEvent;
-        contextRef.current.beginPath();
-        contextRef.current.moveTo(offsetX, offsetY);
-        setIsDrawing(true);
-    };
-
-    const stopDraw = (e) => {
-        setIsDrawing(false);
-        contextRef.current.closePath();
-    };
-
-    const drawing = (e) => {
-        if (!isDrawing) {
-            return;
-        }
-        const { offsetX, offsetY } = e.nativeEvent;
-        contextRef.current.lineTo(offsetX, offsetY);
-        contextRef.current.stroke();
-        const data = canvasRef.current.toDataURL(("image/jpeg", 0.5));
-        socket.emit("canvas-data", { data, room: roomName });
-        console.log(data);
-    };
 
     const handleChangeColor = (e) => {
         setColor(e.target.value);
@@ -135,13 +163,15 @@ const WhiteBoard = () => {
                 <input type='color' onChange={handleChangeColor} />
                 <Button onClick={handleOnLeave}>Leave</Button>
             </ColorsDiv>
-            <canvas
-                onMouseDown={startDraw}
-                onMouseUp={stopDraw}
-                onMouseMove={drawing}
-                ref={canvasRef}
-                id='board'
-            />
+            <div className='sketch' id='sketch'>
+                <canvas
+                    // onMouseDown={startDraw}
+                    // onMouseUp={stopDraw}
+                    // onMouseMove={drawing}
+                    ref={canvasRef}
+                    id='board'
+                />
+            </div>
             {openChat && (
                 <ChatSection
                     setMessages={setMessages}
