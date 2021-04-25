@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { InputGroup, Button, FormControl } from "react-bootstrap";
 import styled from "styled-components";
 import socket from "../modules/socket-clint";
+import { db } from "../firebase/index";
 
 const Room = () => {
     const [roomName, setRoomName] = useState("");
@@ -26,6 +27,10 @@ const Room = () => {
         socket.on("updated-rooms", (data) => {
             setRoomList(data.rooms);
         });
+
+        return () => {
+            socket.emit("disconnect");
+        };
     }, [roomList]);
 
     const handleOnSubmit = (e) => {
@@ -50,6 +55,11 @@ const Room = () => {
             // console.log("join", data);
         });
         navigate(`/whiteboard/${name}/${roomName}`);
+
+        db.collection("rooms").add({
+            name: roomName,
+            drawing: "",
+        });
     };
 
     return (

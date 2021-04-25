@@ -6,10 +6,10 @@ import socket from "../modules/socket-clint";
 import { Button } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import OnlineUsersSection from "./OnlineUsersSection";
+import { db } from "../firebase/index";
 
 const WhiteBoard = () => {
     const canvasRef = useRef();
-    const contextRef = useRef();
     const [isDrawing, setIsDrawing] = useState(true);
     const [color, setColor] = useState("black");
     const [lineSize, setLineSize] = useState(1);
@@ -20,7 +20,6 @@ const WhiteBoard = () => {
     const [users, setUsers] = useState([]);
     const { roomName } = useParams();
     const navigate = useNavigate();
-    let timeout;
 
     const drawOnCanvas = function () {
         const canvas = document.querySelector("#board");
@@ -65,7 +64,6 @@ const WhiteBoard = () => {
             false
         );
 
-        console.log(this);
         let root = {};
         const onPaint = function () {
             ctx.beginPath();
@@ -135,8 +133,9 @@ const WhiteBoard = () => {
     };
 
     const handleOnLeave = () => {
+        console.log("leave");
         socket.emit("disconnect");
-        navigate("/");
+        // navigate("/");
     };
 
     const handleOnlineUsers = () => {

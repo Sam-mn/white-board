@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import socket from "../modules/socket-clint";
+import { db } from "../firebase/index";
 
 const Login = () => {
     const [name, setName] = useState("");
@@ -15,6 +16,7 @@ const Login = () => {
 
     const handleOnSubmit = (e) => {
         e.preventDefault();
+        console.log("im working");
         if (!name) {
             console.log("Write your name to continue");
             setError("Write your name to continue");
@@ -22,6 +24,10 @@ const Login = () => {
         }
         socket.emit("user-name", { name });
         navigate(`/room/${name}`);
+        db.collection("rooms").add({
+            name,
+            drawing: "",
+        });
     };
 
     return (
