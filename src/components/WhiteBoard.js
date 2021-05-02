@@ -71,7 +71,7 @@ const WhiteBoard = () => {
             ctx.lineTo(mouse.x, mouse.y);
             ctx.closePath();
             ctx.stroke();
-            if (root.timeout != undefined) clearTimeout(root.timeout);
+            if (root.timeout !== undefined) clearTimeout(root.timeout);
             root.timeout = setTimeout(function () {
                 const data = canvas.toDataURL("image/png");
                 socket.emit("canvas-data", { data, room: roomName });

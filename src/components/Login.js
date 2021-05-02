@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "react-bootstrap";
 import styled from "styled-components";
 import socket from "../modules/socket-clint";
 import { db } from "../firebase/index";
@@ -37,7 +38,9 @@ const Login = () => {
                 <Label> Write your name here</Label>
                 <Input type='text' onChange={handleOnChange} />
                 {error && <P>{error}</P>}
-                <Button type='submit'>Submit</Button>
+                <StyledButton variant='primary' type='submit'>
+                    Submit
+                </StyledButton>
             </Form>
         </Wrapper>
     );
@@ -90,15 +93,6 @@ const Input = styled.input`
     }
 `;
 
-const Button = styled.button`
+const StyledButton = styled(Button)`
     margin-top: 1rem;
-    border-radius: 0.25rem;
-    color: #fff;
-    background-color: #007bff;
-    border: 1px solid #007bff;
-    padding: 0.4rem;
-    &:hover {
-        background-color: #0069d9;
-        border-color: #0062cc;
-    }
 `;
