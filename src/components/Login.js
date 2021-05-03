@@ -25,10 +25,6 @@ const Login = () => {
         }
         socket.emit("user-name", { name });
         navigate(`/room/${name}`);
-        db.collection("rooms").add({
-            name,
-            drawing: "",
-        });
     };
 
     return (

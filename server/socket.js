@@ -153,4 +153,19 @@ module.exports = function (socket) {
     socket.on("canvas-data", (data) => {
         socket.broadcast.to(data.room).emit("canvas-data", data.data);
     });
+
+    socket.on("leave-room", (data) => {
+        console.log(
+            `User with socketId ${socket.id} wants to leave ${data.room}`
+        );
+
+        const user = removeUser(socket.id);
+
+        if (user) {
+            socket.to(user.room).emit("message", {
+                user: "admin",
+                text: `${user.name} has left`,
+            });
+        }
+    });
 };

@@ -56,10 +56,20 @@ const Room = () => {
         });
         navigate(`/whiteboard/${name}/${roomName}`);
 
-        db.collection("rooms").add({
-            name: roomName,
-            drawing: "",
-        });
+        db.collection("rooms")
+            .doc(roomName)
+            .get()
+            .then((docSnapshot) => {
+                if (docSnapshot.exists) {
+                    console.log("The room is already exist");
+                    return;
+                }
+
+                db.collection("rooms").doc(roomName).set({
+                    name,
+                    drawing: "",
+                });
+            });
     };
 
     return (

@@ -18,7 +18,7 @@ const WhiteBoard = () => {
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
     const [users, setUsers] = useState([]);
-    const { roomName } = useParams();
+    const { roomName, name } = useParams();
     const navigate = useNavigate();
 
     const drawOnCanvas = function () {
@@ -74,6 +74,7 @@ const WhiteBoard = () => {
             if (root.timeout !== undefined) clearTimeout(root.timeout);
             root.timeout = setTimeout(function () {
                 const data = canvas.toDataURL("image/png");
+                db.collection("rooms").doc(roomName).update({ drawing: data });
                 socket.emit("canvas-data", { data, room: roomName });
             }, 1000);
         };
@@ -83,6 +84,23 @@ const WhiteBoard = () => {
         drawOnCanvas();
     }, []);
 
+    useEffect(() => {
+        db.collection("rooms")
+            .doc(roomName)
+            .get()
+            .then((doc) => {
+                // Document was found in the cache. If no cached document exists,
+                // an error will be returned to the 'catch' block below.
+
+                let image = new Image();
+                const canvas = document.querySelector("#board");
+                const context = canvas.getContext("2d");
+                image.onload = () => {
+                    context.drawImage(image, 0, 0);
+                };
+                image.src = doc.data().drawing;
+            });
+    }, []);
     useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
@@ -134,8 +152,8 @@ const WhiteBoard = () => {
 
     const handleOnLeave = () => {
         console.log("leave");
-        socket.emit("disconnect");
-        // navigate("/");
+        socket.emit("leave-room", { room: roomName });
+        navigate(`/room/${name}`);
     };
 
     const handleOnlineUsers = () => {
@@ -163,13 +181,7 @@ const WhiteBoard = () => {
                 <Button onClick={handleOnLeave}>Leave</Button>
             </ColorsDiv>
             <div className='sketch' id='sketch'>
-                <canvas
-                    // onMouseDown={startDraw}
-                    // onMouseUp={stopDraw}
-                    // onMouseMove={drawing}
-                    ref={canvasRef}
-                    id='board'
-                />
+                <canvas ref={canvasRef} id='board' />
             </div>
             {openChat && (
                 <ChatSection
