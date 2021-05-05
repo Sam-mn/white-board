@@ -7,15 +7,11 @@ const userName = (data) => {
 
 const rooms = [
     {
-        name: "general",
+        name: "test1",
         users: {},
     },
     {
-        name: "lieutenant",
-        users: {},
-    },
-    {
-        name: "private",
+        name: "test2",
         users: {},
     },
 ];

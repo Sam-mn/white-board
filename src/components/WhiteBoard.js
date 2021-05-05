@@ -89,16 +89,17 @@ const WhiteBoard = () => {
             .doc(roomName)
             .get()
             .then((doc) => {
-                // Document was found in the cache. If no cached document exists,
-                // an error will be returned to the 'catch' block below.
-
-                let image = new Image();
-                const canvas = document.querySelector("#board");
-                const context = canvas.getContext("2d");
-                image.onload = () => {
-                    context.drawImage(image, 0, 0);
-                };
-                image.src = doc.data().drawing;
+                if (doc.exists && doc.data().drawing) {
+                    let image = new Image();
+                    const canvas = document.querySelector("#board");
+                    const context = canvas.getContext("2d");
+                    image.onload = () => {
+                        context.drawImage(image, 0, 0);
+                    };
+                    image.src = doc.data().drawing;
+                } else {
+                    console.log("doc not exist");
+                }
             });
     }, []);
     useEffect(() => {
@@ -154,6 +155,13 @@ const WhiteBoard = () => {
         console.log("leave");
         socket.emit("leave-room", { room: roomName });
         navigate(`/room/${name}`);
+        socket.emit("getUsers", { room: roomName }, (data) => {
+            console.log(data.users);
+            if (!data.users.length > 0) {
+                console.log("its empty");
+                db.collection("rooms").doc(roomName).delete();
+            }
+        });
     };
 
     const handleOnlineUsers = () => {
