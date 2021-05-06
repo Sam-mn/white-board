@@ -160,6 +160,7 @@ const WhiteBoard = () => {
             if (!data.users.length > 0) {
                 console.log("its empty");
                 db.collection("rooms").doc(roomName).delete();
+                socket.emit("delete-room", { room: roomName });
             }
         });
     };
@@ -226,15 +227,16 @@ const ColorsDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 20%;
-    background-color: #636363;
+    width: 22%;
+    /* background-color: #e8e8e8; */
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
     margin: 0 auto;
-    border: 2px solid #ccc;
-    border-radius: 0.6rem 0.6rem 0 0;
+    /* border: 1px solid #696969;
+    border-top: none;
+    border-radius: 0 0 0.6rem 0.6rem; */
     height: 2.5rem;
 `;
 
@@ -261,6 +263,6 @@ const FlexDiv = styled.div`
 
 const StyledLeaveButton = styled(Button)`
     position: absolute;
-    right: 2%;
-    top: 1rem;
+    right: 1%;
+    top: 1.2%;
 `;

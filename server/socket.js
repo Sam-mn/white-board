@@ -5,7 +5,7 @@ const userName = (data) => {
     console.log(data);
 };
 
-const rooms = [
+let rooms = [
     {
         name: "test1",
         users: {},
@@ -17,27 +17,6 @@ const rooms = [
 ];
 
 const users = {};
-
-/**
- * Get room names
- */
-function getListOfRoomNames() {
-    return rooms.map((room) => room.name);
-}
-
-/**
- * Get room by user id
- */
-function getRoomByUserId(id) {
-    return rooms.find((room) => room.users.hasOwnProperty(id));
-}
-
-/**
- * Handle a request for rooms
- */
-function handleGetRoomList(callback) {
-    callback(getListOfRoomNames());
-}
 
 module.exports = function (socket) {
     // this = io
@@ -132,14 +111,19 @@ module.exports = function (socket) {
         console.log(
             `User with socketId ${socket.id} wants to leave ${data.room}`
         );
-
         const user = removeUser(socket.id);
-
+        io.emit("roomList", { rooms });
         if (user) {
             socket.to(user.room).emit("message", {
                 user: "admin",
                 text: `${user.name} has left`,
             });
         }
+    });
+
+    socket.on("delete-room", (data) => {
+        const updatedRooms = rooms.filter((d) => d.name !== data.room);
+        rooms = updatedRooms;
+        io.emit("roomList", { rooms });
     });
 };
