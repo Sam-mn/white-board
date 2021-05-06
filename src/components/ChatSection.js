@@ -133,7 +133,7 @@ const OthersMsg = styled.div`
 const Form = styled.form``;
 
 const Input = styled.input`
-    width: 90%;
+    width: 96%;
     padding: 0.3rem;
 `;
 

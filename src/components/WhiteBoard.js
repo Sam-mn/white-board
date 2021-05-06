@@ -174,7 +174,11 @@ const WhiteBoard = () => {
 
     return (
         <MainDiv>
+            <StyledLeaveButton variant='danger' onClick={handleOnLeave}>
+                Leave
+            </StyledLeaveButton>
             <ColorsDiv className='colors'>
+                <input type='color' onChange={handleChangeColor} />
                 <SizeDiv>
                     <select name='size' id='size' onChange={handleOnChange}>
                         <option value='1'>1</option>
@@ -185,8 +189,6 @@ const WhiteBoard = () => {
                         <option value='6'>6</option>
                     </select>
                 </SizeDiv>
-                <input type='color' onChange={handleChangeColor} />
-                <Button onClick={handleOnLeave}>Leave</Button>
             </ColorsDiv>
             <div className='sketch' id='sketch'>
                 <canvas ref={canvasRef} id='board' />
@@ -224,16 +226,23 @@ const ColorsDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    background-color: #565555;
+    width: 20%;
+    background-color: #636363;
     position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    border: 2px solid #ccc;
+    border-radius: 0.6rem 0.6rem 0 0;
+    height: 2.5rem;
 `;
 
 const SizeDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: 0.5rem;
+    margin-left: 0.5rem;
 `;
 
 const IconDiv = styled.div``;
@@ -248,4 +257,10 @@ const FlexDiv = styled.div`
     bottom: 3rem;
     left: 1rem;
     cursor: pointer;
+`;
+
+const StyledLeaveButton = styled(Button)`
+    position: absolute;
+    right: 2%;
+    top: 1rem;
 `;

@@ -26,28 +26,6 @@ function getListOfRoomNames() {
 }
 
 /**
- * Get usernames of online users in room
- */
-function getOnlineUsersInRoom(room) {
-    return Object.values(room.users);
-}
-
-/**
- * Get room by roomName
- */
-function getRoomByName(roomName) {
-    return rooms.find((room) => room.name === roomName);
-}
-
-/**
- * Get username by id
- */
-function getUsernameById(id) {
-    const room = getRoomByUserId(id);
-    return room.users[id];
-}
-
-/**
  * Get room by user id
  */
 function getRoomByUserId(id) {
