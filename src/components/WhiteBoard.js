@@ -7,7 +7,6 @@ import { Button } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import OnlineUsersSection from "./OnlineUsersSection";
 import { db } from "../firebase/index";
-
 const WhiteBoard = () => {
     const canvasRef = useRef();
     const [isDrawing, setIsDrawing] = useState(true);
@@ -21,8 +20,10 @@ const WhiteBoard = () => {
     const { roomName, name } = useParams();
     const navigate = useNavigate();
 
-    const drawOnCanvas = function () {
+    useEffect(() => {
         const canvas = document.querySelector("#board");
+        //if the element is undefined return;
+        if (!canvas) return;
         const ctx = canvas.getContext("2d");
         const sketch = document.querySelector("#sketch");
         const sketch_style = getComputedStyle(sketch);
@@ -78,10 +79,6 @@ const WhiteBoard = () => {
                 socket.emit("canvas-data", { data, room: roomName });
             }, 1000);
         };
-    };
-
-    useEffect(() => {
-        drawOnCanvas();
     }, []);
 
     useEffect(() => {
@@ -153,16 +150,7 @@ const WhiteBoard = () => {
 
     const handleOnLeave = () => {
         console.log("leave");
-        socket.emit("leave-room", { room: roomName });
         navigate(`/room/${name}`);
-        socket.emit("getUsers", { room: roomName }, (data) => {
-            console.log(data.users);
-            if (!data.users.length > 0) {
-                console.log("its empty");
-                db.collection("rooms").doc(roomName).delete();
-                socket.emit("delete-room", { room: roomName });
-            }
-        });
     };
 
     const handleOnlineUsers = () => {
@@ -172,7 +160,23 @@ const WhiteBoard = () => {
             setUsers(data);
         });
     };
-
+    useEffect(() => {
+        return () => {
+            socket.emit("leave-room", { room: roomName });
+            socket.emit("getUsers", { room: roomName }, (data) => {
+                console.log(data.users);
+                if (!data.users.length > 0) {
+                    console.log("its empty");
+                    db.collection("rooms").doc(roomName).delete();
+                    socket.emit("delete-room", { room: roomName });
+                }
+            });
+            socket.off("canvas-data");
+            socket.off("updated-waiting-list");
+            socket.off("message");
+            socket.off("canvas-data");
+        };
+    }, []);
     return (
         <MainDiv>
             <StyledLeaveButton variant='danger' onClick={handleOnLeave}>
