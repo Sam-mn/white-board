@@ -75,7 +75,7 @@ const WhiteBoard = () => {
             if (root.timeout !== undefined) clearTimeout(root.timeout);
             root.timeout = setTimeout(function () {
                 const data = canvas.toDataURL("image/png");
-                db.collection("rooms").doc(roomName).update({ drawing: data });
+
                 socket.emit("canvas-data", { data, room: roomName });
             }, 1000);
         };
@@ -167,7 +167,6 @@ const WhiteBoard = () => {
                 console.log(data.users);
                 if (!data.users.length > 0) {
                     console.log("its empty");
-                    db.collection("rooms").doc(roomName).delete();
                     socket.emit("delete-room", { room: roomName });
                 }
             });

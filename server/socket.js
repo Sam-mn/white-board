@@ -1,5 +1,6 @@
 const debug = require("debug")("whiteboard:socket");
 const { addUser, removeUser, getUser, getUserInRoom } = require("./users");
+const { db } = require("./firebase/index");
 
 const userName = (data) => {
     console.log(data);
@@ -88,6 +89,10 @@ module.exports = function (socket) {
 
     socket.on("getUsers", (data, callback) => {
         console.log(data);
+        const users = getUserInRoom(data.room);
+        if (!data.users.length > 0) {
+            db.collection("rooms").doc(data.room).delete();
+        }
         callback({ users: getUserInRoom(data.room) });
     });
 
@@ -104,6 +109,7 @@ module.exports = function (socket) {
     });
 
     socket.on("canvas-data", (data) => {
+        db.collection("rooms").doc(data.room).update({ drawing: data.data });
         socket.broadcast.to(data.room).emit("canvas-data", data.data);
     });
 
