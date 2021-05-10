@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { FaUserAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
@@ -6,6 +6,7 @@ import socket from "../modules/socket-clint";
 
 const ChatSection = ({ setMessages, setMessage, message, messages }) => {
     const { name } = useParams();
+    const messagesEndRef = useRef(null);
 
     useEffect(() => {
         socket.on("message", (message) => {
@@ -24,6 +25,11 @@ const ChatSection = ({ setMessages, setMessage, message, messages }) => {
         }
     };
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(scrollToBottom, [messages]);
     return (
         <MainDiv>
             <ChatDiv>
@@ -50,6 +56,7 @@ const ChatSection = ({ setMessages, setMessage, message, messages }) => {
                         );
                     }
                 })}
+                <div ref={messagesEndRef} />
             </ChatDiv>
             <Form onSubmit={handleOnSubmit}>
                 <Input
