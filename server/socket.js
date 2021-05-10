@@ -1,4 +1,3 @@
-const debug = require("debug")("whiteboard:socket");
 const { addUser, removeUser, getUser, getUserInRoom } = require("./users");
 
 const userName = (data) => {
