@@ -1,4 +1,5 @@
 const { addUser, removeUser, getUser, getUserInRoom } = require("./users");
+const { db } = require("./firebase/index");
 
 const userName = (data) => {
     console.log(data);
@@ -68,6 +69,20 @@ module.exports = function (socket) {
         });
 
         io.to(user.room).emit("getOnlineUser", { users: getUserInRoom() });
+        db.collection("rooms")
+            .doc(user.room)
+            .get()
+            .then((docSnapshot) => {
+                if (docSnapshot.exists) {
+                    console.log("The room is already exist");
+                    return;
+                }
+
+                db.collection("rooms").doc(user.room).set({
+                    name,
+                    drawing: "",
+                });
+            });
 
         callback({
             joinChat: true,
@@ -87,6 +102,10 @@ module.exports = function (socket) {
 
     socket.on("getUsers", (data, callback) => {
         console.log(data);
+        const users = getUserInRoom(data.room);
+        if (!users.length > 0) {
+            db.collection("rooms").doc(data.room).delete();
+        }
         callback({ users: getUserInRoom(data.room) });
     });
 
@@ -103,6 +122,7 @@ module.exports = function (socket) {
     });
 
     socket.on("canvas-data", (data) => {
+        db.collection("rooms").doc(data.room).update({ drawing: data.data });
         socket.broadcast.to(data.room).emit("canvas-data", data.data);
     });
 
@@ -124,5 +144,19 @@ module.exports = function (socket) {
         const updatedRooms = rooms.filter((d) => d.name !== data.room);
         rooms = updatedRooms;
         io.emit("roomList", { rooms });
+    });
+
+    socket.on("get-existing-data", (data, callback) => {
+        db.collection("rooms")
+            .doc(data.room)
+            .get()
+            .then((doc) => {
+                if (doc.exists && doc.data().drawing) {
+                    console.log("dac is exist");
+                    callback({ data: doc.data().drawing });
+                } else {
+                    console.log("doc not exist");
+                }
+            });
     });
 };

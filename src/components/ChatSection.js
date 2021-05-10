@@ -11,7 +11,10 @@ const ChatSection = ({ setMessages, setMessage, message, messages }) => {
         socket.on("message", (message) => {
             setMessages([...messages, message]);
         });
-    }, [messages]);
+        return () => {
+            socket.off("message");
+        };
+    }, [messages, setMessages]);
 
     const handleOnSubmit = (e) => {
         e.preventDefault();

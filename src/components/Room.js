@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { InputGroup, Button, FormControl } from "react-bootstrap";
 import styled from "styled-components";
 import socket from "../modules/socket-clint";
-import { db } from "../firebase/index";
 
 const Room = () => {
     const [roomName, setRoomName] = useState("");
@@ -21,6 +20,10 @@ const Room = () => {
         socket.on("roomList", (data) => {
             setRoomList(data.rooms);
         });
+
+        return () => {
+            socket.off("roomList");
+        };
     }, [roomList]);
 
     useEffect(() => {
@@ -30,6 +33,7 @@ const Room = () => {
 
         return () => {
             socket.emit("disconnect");
+            socket.off("updated-rooms");
         };
     }, [roomList]);
 
@@ -55,21 +59,6 @@ const Room = () => {
             // console.log("join", data);
         });
         navigate(`/whiteboard/${name}/${roomName}`);
-
-        db.collection("rooms")
-            .doc(roomName)
-            .get()
-            .then((docSnapshot) => {
-                if (docSnapshot.exists) {
-                    console.log("The room is already exist");
-                    return;
-                }
-
-                db.collection("rooms").doc(roomName).set({
-                    name,
-                    drawing: "",
-                });
-            });
     };
 
     return (
