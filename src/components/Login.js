@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import styled from "styled-components";
 import socket from "../modules/socket-clint";
-import { db } from "../firebase/index";
 
 const Login = () => {
     const [name, setName] = useState("");

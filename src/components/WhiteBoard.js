@@ -6,10 +6,9 @@ import socket from "../modules/socket-clint";
 import { Button } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import OnlineUsersSection from "./OnlineUsersSection";
-import { db } from "../firebase/index";
+
 const WhiteBoard = () => {
     const canvasRef = useRef();
-    const [isDrawing, setIsDrawing] = useState(true);
     const [color, setColor] = useState("black");
     const [lineSize, setLineSize] = useState(1);
     const [openChat, setOpenChat] = useState(false);
@@ -79,26 +78,21 @@ const WhiteBoard = () => {
                 socket.emit("canvas-data", { data, room: roomName });
             }, 1000);
         };
-    }, []);
+    }, [roomName]);
 
     useEffect(() => {
-        db.collection("rooms")
-            .doc(roomName)
-            .get()
-            .then((doc) => {
-                if (doc.exists && doc.data().drawing) {
-                    let image = new Image();
-                    const canvas = document.querySelector("#board");
-                    const context = canvas.getContext("2d");
-                    image.onload = () => {
-                        context.drawImage(image, 0, 0);
-                    };
-                    image.src = doc.data().drawing;
-                } else {
-                    console.log("doc not exist");
-                }
-            });
-    }, []);
+        socket.emit("get-existing-data", { room: roomName }, (data) => {
+            console.log(data);
+            if (!data) return;
+            let image = new Image();
+            const canvas = document.querySelector("#board");
+            const context = canvas.getContext("2d");
+            image.onload = () => {
+                context.drawImage(image, 0, 0);
+            };
+            image.src = data.data;
+        });
+    }, [roomName]);
     useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
@@ -127,7 +121,7 @@ const WhiteBoard = () => {
             };
             image.src = data;
         });
-    }, [isDrawing]);
+    }, []);
 
     useEffect(() => {
         socket.on("updated-waiting-list", (data) => {
@@ -175,7 +169,7 @@ const WhiteBoard = () => {
             socket.off("message");
             socket.off("canvas-data");
         };
-    }, []);
+    }, [roomName]);
     return (
         <MainDiv>
             <StyledLeaveButton variant='danger' onClick={handleOnLeave}>
