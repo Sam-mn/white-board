@@ -71,6 +71,7 @@ const Room = () => {
                         aria-label='create a new room'
                         aria-describedby='basic-addon2'
                         onChange={handleOnChange}
+                        required
                     />
                     <InputGroup.Append>
                         <Button variant='outline-primary' type='submit'>
@@ -132,9 +133,11 @@ const Form = styled.form`
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    width: 50%;
     margin: 0 auto;
     align-self: center;
+    @media (min-width: 800px) {
+        width: 50%;
+    }
 `;
 
 const Ul = styled.ul`

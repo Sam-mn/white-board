@@ -63,9 +63,38 @@ const WhiteBoard = () => {
             },
             false
         );
+        canvas.addEventListener(
+            "touchstart",
+            function () {
+                canvas.removeEventListener("mousemove", onPaint, false);
+            },
+            false
+        );
+        canvas.addEventListener(
+            "touchend",
+            function () {
+                canvas.removeEventListener("mousemove", onPaint, false);
+            },
+            false
+        );
+
+        canvas.addEventListener(
+            "touchmove",
+            function (e) {
+                var touch = e.touches[0];
+                canvas.addEventListener("mousemove", function (e) {
+                    last_mouse.x = mouse.x;
+                    last_mouse.y = mouse.y;
+
+                    mouse.x = e.pageX - touch.clientX;
+                    mouse.y = e.pageY - touch.clientY;
+                });
+            },
+            false
+        );
 
         let root = {};
-        const onPaint = function () {
+        const onPaint = function (e) {
             ctx.beginPath();
             ctx.moveTo(last_mouse.x, last_mouse.y);
             ctx.lineTo(mouse.x, mouse.y);
