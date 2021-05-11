@@ -5,16 +5,7 @@ const userName = (data) => {
     console.log(data);
 };
 
-let rooms = [
-    {
-        name: "test1",
-        users: {},
-    },
-    {
-        name: "test2",
-        users: {},
-    },
-];
+let rooms = [];
 
 const users = {};
 
