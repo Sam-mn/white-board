@@ -21,7 +21,7 @@ app.set("port", port);
  */
 
 const server = http.createServer(app);
-const io = SocketIO(server);
+const io = SocketIO.listen(server);
 
 io.on("connection", require("./socket.js"));
 
