@@ -26,11 +26,11 @@ const WhiteBoard = () => {
         const ctx = canvas.getContext("2d");
         const sketch = document.querySelector("#sketch");
         const sketch_style = getComputedStyle(sketch);
-        canvas.width = parseInt(sketch_style.getPropertyValue("width"));
-        canvas.height = parseInt(sketch_style.getPropertyValue("height"));
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         const mouse = { x: 0, y: 0 };
         const last_mouse = { x: 0, y: 0 };
-
+        console.log(window.innerWidth);
         /* Mouse Capturing Work */
         canvas.addEventListener(
             "mousemove",
@@ -48,7 +48,6 @@ const WhiteBoard = () => {
             "touchmove",
             function (e) {
                 const touch = e.touches[0];
-
                 last_mouse.x = mouse.x;
                 last_mouse.y = mouse.y;
 
@@ -212,11 +211,6 @@ const WhiteBoard = () => {
             </StyledLeaveButton>
             <ColorsDiv className='colors'>
                 <StyledEraser
-                    style={{
-                        width: "1.5rem",
-                        height: "1.5rem",
-                        marginRight: "0.5rem",
-                    }}
                     onClick={() => {
                         setColor("#fff");
                     }}
@@ -272,7 +266,7 @@ const ColorsDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 22%;
+    width: 30%;
     /* background-color: #e8e8e8; */
     position: absolute;
     top: 0;
@@ -314,4 +308,11 @@ const StyledLeaveButton = styled(Button)`
 
 const StyledEraser = styled(FaEraser)`
     cursor: pointer;
+    width: 3rem;
+    height: 3rem;
+    margin-right: 0.5rem;
+    @media (min-width: 768px) {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
 `;
