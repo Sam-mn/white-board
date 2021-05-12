@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { InputGroup, Button, FormControl } from "react-bootstrap";
+import { InputGroup, Button, FormControl, Alert } from "react-bootstrap";
 import styled from "styled-components";
 import socket from "../modules/socket-clint";
 
@@ -81,9 +81,9 @@ const Room = () => {
                 </InputGroup>
                 {error && <P>{error}</P>}
             </Form>
-            <Ul>
-                {roomList &&
-                    roomList.map((room, i) => {
+            {roomList.length > 0 ? (
+                <Ul>
+                    {roomList.map((room, i) => {
                         return (
                             <Li key={i}>
                                 <span>{room.name}</span>
@@ -98,7 +98,12 @@ const Room = () => {
                             </Li>
                         );
                     })}
-            </Ul>
+                </Ul>
+            ) : (
+                <StyledAlert variant='info'>
+                    There are no rooms yet!
+                </StyledAlert>
+            )}
         </Wrapper>
     );
 };
@@ -155,6 +160,13 @@ const Li = styled.li`
     padding: 0.5rem;
     border-bottom: 1px solid;
     align-items: center;
+`;
+
+const StyledAlert = styled(Alert)`
+    margin: 0 auto;
+    @media (min-width: 800px) {
+        width: 30%;
+    }
 `;
 
 // const Input = styled.input`

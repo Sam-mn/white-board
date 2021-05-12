@@ -27,12 +27,13 @@ const MainDiv = styled.div`
     position: absolute;
     height: 23rem;
     width: 16rem;
-    bottom: 6rem;
+    bottom: 16%;
     border: 1px solid black;
     border-radius: 0.5rem;
     padding-top: 1rem;
     padding-bottom: 0.3rem;
     margin-left: 1rem;
+    background-color: #ececec;
 `;
 
 const Ul = styled.ul`

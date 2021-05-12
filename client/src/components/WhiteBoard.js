@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
-import { FaComments, FaUsers } from "react-icons/fa";
+import { FaComments, FaUsers, FaEraser } from "react-icons/fa";
 import ChatSection from "./ChatSection";
 import socket from "../modules/socket-clint";
 import { Button } from "react-bootstrap";
@@ -30,6 +30,7 @@ const WhiteBoard = () => {
         canvas.height = parseInt(sketch_style.getPropertyValue("height"));
         const mouse = { x: 0, y: 0 };
         const last_mouse = { x: 0, y: 0 };
+
         /* Mouse Capturing Work */
         canvas.addEventListener(
             "mousemove",
@@ -42,6 +43,21 @@ const WhiteBoard = () => {
             },
             false
         );
+
+        canvas.addEventListener(
+            "touchmove",
+            function (e) {
+                const touch = e.touches[0];
+
+                last_mouse.x = mouse.x;
+                last_mouse.y = mouse.y;
+
+                mouse.x = touch.pageX - this.offsetLeft;
+                mouse.y = touch.pageY - this.offsetTop;
+            },
+            false
+        );
+
         /* Drawing on Paint App */
         ctx.lineWidth = 5;
         ctx.lineJoin = "round";
@@ -63,36 +79,24 @@ const WhiteBoard = () => {
             },
             false
         );
+
         canvas.addEventListener(
             "touchstart",
             function () {
-                canvas.removeEventListener("mousemove", onPaint, false);
+                canvas.addEventListener("touchmove", onPaint, false);
             },
             false
         );
+
         canvas.addEventListener(
             "touchend",
             function () {
-                canvas.removeEventListener("mousemove", onPaint, false);
+                canvas.removeEventListener("touchmove", onPaint, false);
             },
             false
         );
 
-        canvas.addEventListener(
-            "touchmove",
-            function (e) {
-                var touch = e.touches[0];
-                canvas.addEventListener("mousemove", function (e) {
-                    last_mouse.x = mouse.x;
-                    last_mouse.y = mouse.y;
-
-                    mouse.x = e.pageX - touch.clientX;
-                    mouse.y = e.pageY - touch.clientY;
-                });
-            },
-            false
-        );
-
+        console.log(canvas.width);
         let root = {};
         const onPaint = function (e) {
             ctx.beginPath();
@@ -103,7 +107,6 @@ const WhiteBoard = () => {
             if (root.timeout !== undefined) clearTimeout(root.timeout);
             root.timeout = setTimeout(function () {
                 const data = canvas.toDataURL("image/png");
-
                 socket.emit("canvas-data", { data, room: roomName });
             }, 1000);
         };
@@ -122,6 +125,7 @@ const WhiteBoard = () => {
             image.src = data.data;
         });
     }, [roomName]);
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
@@ -183,6 +187,7 @@ const WhiteBoard = () => {
             setUsers(data);
         });
     };
+
     useEffect(() => {
         return () => {
             socket.emit("leave-room", { room: roomName });
@@ -199,12 +204,23 @@ const WhiteBoard = () => {
             socket.off("canvas-data");
         };
     }, [roomName]);
+
     return (
         <MainDiv>
             <StyledLeaveButton variant='danger' onClick={handleOnLeave}>
                 Leave
             </StyledLeaveButton>
             <ColorsDiv className='colors'>
+                <StyledEraser
+                    style={{
+                        width: "1.5rem",
+                        height: "1.5rem",
+                        marginRight: "0.5rem",
+                    }}
+                    onClick={() => {
+                        setColor("#fff");
+                    }}
+                />
                 <input type='color' onChange={handleChangeColor} />
                 <SizeDiv>
                     <select name='size' id='size' onChange={handleOnChange}>
@@ -214,6 +230,8 @@ const WhiteBoard = () => {
                         <option value='4'>4</option>
                         <option value='5'>5</option>
                         <option value='6'>6</option>
+                        <option value='7'>7</option>
+                        <option value='8'>8</option>
                     </select>
                 </SizeDiv>
             </ColorsDiv>
@@ -246,6 +264,7 @@ export default WhiteBoard;
 
 const MainDiv = styled.div`
     position: relative;
+    cursor: crosshair;
 `;
 
 const ColorsDiv = styled.div`
@@ -282,7 +301,7 @@ const UsersIconDiv = styled.div`
 const FlexDiv = styled.div`
     display: flex;
     position: absolute;
-    bottom: 3rem;
+    bottom: 8%;
     left: 1rem;
     cursor: pointer;
 `;
@@ -291,4 +310,8 @@ const StyledLeaveButton = styled(Button)`
     position: absolute;
     right: 1%;
     top: 1.2%;
+`;
+
+const StyledEraser = styled(FaEraser)`
+    cursor: pointer;
 `;
