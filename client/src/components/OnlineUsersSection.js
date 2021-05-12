@@ -3,12 +3,10 @@ import styled from "styled-components";
 import { FaUserAlt } from "react-icons/fa";
 
 const OnlineUsersSection = ({ users }) => {
-    console.log(users.users);
     return (
         <MainDiv>
             <Ul>
                 {users.users?.map((u) => {
-                    console.log(u);
                     return (
                         <Li key={u.id}>
                             <FaUserAlt style={{ color: "green" }} />

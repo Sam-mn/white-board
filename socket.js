@@ -65,7 +65,6 @@ module.exports = function (socket) {
             .get()
             .then((docSnapshot) => {
                 if (docSnapshot.exists) {
-                    console.log("The room is already exist");
                     return;
                 }
 
@@ -92,7 +91,6 @@ module.exports = function (socket) {
     io.emit("roomList", { rooms });
 
     socket.on("getUsers", (data, callback) => {
-        console.log(data);
         const users = getUserInRoom(data.room);
         if (!users.length > 0) {
             db.collection("rooms").doc(data.room).delete();
@@ -143,7 +141,6 @@ module.exports = function (socket) {
             .get()
             .then((doc) => {
                 if (doc.exists && doc.data().drawing) {
-                    console.log("dac is exist");
                     callback({ data: doc.data().drawing });
                 } else {
                     console.log("doc not exist");

@@ -30,16 +30,15 @@ const WhiteBoard = () => {
         canvas.height = window.innerHeight;
         const mouse = { x: 0, y: 0 };
         const last_mouse = { x: 0, y: 0 };
-        console.log(window.innerWidth);
+
         /* Mouse Capturing Work */
         canvas.addEventListener(
             "mousemove",
             function (e) {
                 last_mouse.x = mouse.x;
                 last_mouse.y = mouse.y;
-
-                mouse.x = e.pageX - this.offsetLeft;
-                mouse.y = e.pageY - this.offsetTop;
+                mouse.x = e.pageX - canvas.offsetLeft;
+                mouse.y = e.pageY - canvas.offsetTop;
             },
             false
         );
@@ -50,9 +49,8 @@ const WhiteBoard = () => {
                 const touch = e.touches[0];
                 last_mouse.x = mouse.x;
                 last_mouse.y = mouse.y;
-
-                mouse.x = touch.pageX - this.offsetLeft;
-                mouse.y = touch.pageY - this.offsetTop;
+                mouse.x = touch.pageX;
+                mouse.y = touch.pageY;
             },
             false
         );
@@ -95,8 +93,8 @@ const WhiteBoard = () => {
             false
         );
 
-        console.log(canvas.width);
         let root = {};
+
         const onPaint = function (e) {
             ctx.beginPath();
             ctx.moveTo(last_mouse.x, last_mouse.y);
@@ -113,7 +111,6 @@ const WhiteBoard = () => {
 
     useEffect(() => {
         socket.emit("get-existing-data", { room: roomName }, (data) => {
-            console.log(data);
             if (!data) return;
             let image = new Image();
             const canvas = document.querySelector("#board");
@@ -156,9 +153,7 @@ const WhiteBoard = () => {
     }, []);
 
     useEffect(() => {
-        socket.on("updated-waiting-list", (data) => {
-            console.log("Got updated waiting list from server:", data);
-        });
+        socket.on("updated-waiting-list", (data) => {});
     }, []);
 
     const handleChangeColor = (e) => {
@@ -175,7 +170,6 @@ const WhiteBoard = () => {
     };
 
     const handleOnLeave = () => {
-        console.log("leave");
         navigate(`/room/${name}`);
     };
 
@@ -191,9 +185,7 @@ const WhiteBoard = () => {
         return () => {
             socket.emit("leave-room", { room: roomName });
             socket.emit("getUsers", { room: roomName }, (data) => {
-                console.log(data.users);
                 if (!data.users.length > 0) {
-                    console.log("its empty");
                     socket.emit("delete-room", { room: roomName });
                 }
             });
@@ -277,6 +269,7 @@ const ColorsDiv = styled.div`
     border-top: none;
     border-radius: 0 0 0.6rem 0.6rem; */
     height: 2.5rem;
+    margin-top: 0.5rem;
 `;
 
 const SizeDiv = styled.div`
@@ -312,7 +305,11 @@ const StyledEraser = styled(FaEraser)`
     height: 3rem;
     margin-right: 0.5rem;
     @media (min-width: 768px) {
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    @media (min-width: 992px) {
+        width: 2rem;
+        height: 2rem;
     }
 `;

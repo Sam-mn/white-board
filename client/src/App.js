@@ -8,12 +8,9 @@ import socket from "./modules/socket-clint";
 
 function App() {
     useEffect(() => {
-        socket.on("connection", (data) => {
-            console.log("connected to socket server" + data);
-        });
+        socket.on("connection", (data) => {});
 
         return () => {
-            console.log("Will disconnect from socket-server now...");
             socket.removeAllListeners();
             socket.disconnect();
             socket.off();

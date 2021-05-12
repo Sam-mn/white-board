@@ -16,9 +16,7 @@ const Login = () => {
 
     const handleOnSubmit = (e) => {
         e.preventDefault();
-        console.log("im working");
         if (!name) {
-            console.log("Write your name to continue");
             setError("Write your name to continue");
             return;
         }
