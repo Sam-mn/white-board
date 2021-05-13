@@ -16,6 +16,7 @@ const Room = () => {
         setRoomName(e.target.value);
     };
 
+    // get rooms list
     useEffect(() => {
         socket.on("roomList", (data) => {
             setRoomList(data.rooms);
@@ -26,6 +27,7 @@ const Room = () => {
         };
     }, [roomList]);
 
+    // update rooms when some one create a new room
     useEffect(() => {
         socket.on("updated-rooms", (data) => {
             setRoomList(data.rooms);
@@ -37,14 +39,13 @@ const Room = () => {
         };
     }, [roomList]);
 
+    // create a room and join it
     const handleOnSubmit = (e) => {
         e.preventDefault();
-
         if (!roomName) {
             setError("Chose a room name to continue");
             return;
         }
-
         socket.emit("join", { name, roomName }, (data) => {
             // setRoomList(data);
             // console.log(data);
@@ -53,6 +54,7 @@ const Room = () => {
         navigate(`/whiteboard/${name}/${roomName}`);
     };
 
+    // join a specific room
     const handleJoinRoom = (e, roomName) => {
         socket.emit("join", { name, roomName }, (data) => {
             // setRoomList(data);

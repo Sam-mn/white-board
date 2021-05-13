@@ -31,7 +31,7 @@ const WhiteBoard = () => {
         const mouse = { x: 0, y: 0 };
         const last_mouse = { x: 0, y: 0 };
 
-        /* Mouse Capturing Work */
+        //mouse moving event
         canvas.addEventListener(
             "mousemove",
             function (e) {
@@ -43,6 +43,7 @@ const WhiteBoard = () => {
             false
         );
 
+        // touch moving event for ipad and phones
         canvas.addEventListener(
             "touchmove",
             function (e) {
@@ -55,12 +56,11 @@ const WhiteBoard = () => {
             false
         );
 
-        /* Drawing on Paint App */
-        ctx.lineWidth = 5;
+        // Drawing on Paint App
         ctx.lineJoin = "round";
         ctx.lineCap = "round";
-        ctx.strokeStyle = "blue";
 
+        // mouse and touch start and stop event
         canvas.addEventListener(
             "mousedown",
             function (e) {
@@ -94,7 +94,7 @@ const WhiteBoard = () => {
         );
 
         let root = {};
-
+        //painting function
         const onPaint = function (e) {
             ctx.beginPath();
             ctx.moveTo(last_mouse.x, last_mouse.y);
@@ -102,6 +102,7 @@ const WhiteBoard = () => {
             ctx.closePath();
             ctx.stroke();
             if (root.timeout !== undefined) clearTimeout(root.timeout);
+            //send canvas data every 1 second
             root.timeout = setTimeout(function () {
                 const data = canvas.toDataURL("image/png");
                 socket.emit("canvas-data", { data, room: roomName });
@@ -110,6 +111,7 @@ const WhiteBoard = () => {
     }, [roomName]);
 
     useEffect(() => {
+        // get the canvas data for the new users if it exist
         socket.emit("get-existing-data", { room: roomName }, (data) => {
             if (!data) return;
             let image = new Image();
@@ -123,24 +125,28 @@ const WhiteBoard = () => {
     }, [roomName]);
 
     useEffect(() => {
+        //change the line color
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
         context.strokeStyle = color;
     }, [color]);
 
     useEffect(() => {
+        //change the line size
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
         context.lineWidth = lineSize;
     }, [lineSize]);
 
     useEffect(() => {
+        //get the messages
         socket.on("message", (message) => {
             setMessages([...messages, message]);
         });
     }, [messages]);
 
     useEffect(() => {
+        //send canvas data to the other users in the room
         socket.on("canvas-data", (data) => {
             let image = new Image();
             const canvas = document.querySelector("#board");
@@ -153,35 +159,7 @@ const WhiteBoard = () => {
     }, []);
 
     useEffect(() => {
-        socket.on("updated-waiting-list", (data) => {});
-    }, []);
-
-    const handleChangeColor = (e) => {
-        setColor(e.target.value);
-    };
-
-    const handleOnChange = (e) => {
-        setLineSize(e.target.value);
-    };
-
-    const handleOpenChat = () => {
-        setOpenChat(!openChat);
-        setOpenOnlineUsers(false);
-    };
-
-    const handleOnLeave = () => {
-        navigate(`/room/${name}`);
-    };
-
-    const handleOnlineUsers = () => {
-        setOpenOnlineUsers(!openOnlineUsers);
-        setOpenChat(false);
-        socket.emit("getUsers", { room: roomName }, (data) => {
-            setUsers(data);
-        });
-    };
-
-    useEffect(() => {
+        // clean up all sockets, get the rooms again and delete the room and the its data if it's empty
         return () => {
             socket.emit("leave-room", { room: roomName });
             socket.emit("getUsers", { room: roomName }, (data) => {
@@ -195,6 +173,36 @@ const WhiteBoard = () => {
             socket.off("canvas-data");
         };
     }, [roomName]);
+
+    //change color
+    const handleChangeColor = (e) => {
+        setColor(e.target.value);
+    };
+
+    //change size
+    const handleOnChange = (e) => {
+        setLineSize(e.target.value);
+    };
+
+    //open the chat and close the user section
+    const handleOpenChat = () => {
+        setOpenChat(!openChat);
+        setOpenOnlineUsers(false);
+    };
+
+    //leave the room
+    const handleOnLeave = () => {
+        navigate(`/room/${name}`);
+    };
+
+    // open the user section, get users and close the chat section
+    const handleOnlineUsers = () => {
+        setOpenOnlineUsers(!openOnlineUsers);
+        setOpenChat(false);
+        socket.emit("getUsers", { room: roomName }, (data) => {
+            setUsers(data);
+        });
+    };
 
     return (
         <MainDiv>

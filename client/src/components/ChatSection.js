@@ -8,6 +8,7 @@ const ChatSection = ({ setMessages, setMessage, message, messages }) => {
     const { name } = useParams();
     const messagesEndRef = useRef(null);
 
+    //get messages
     useEffect(() => {
         socket.on("message", (message) => {
             setMessages([...messages, message]);
@@ -17,6 +18,7 @@ const ChatSection = ({ setMessages, setMessage, message, messages }) => {
         };
     }, [messages, setMessages]);
 
+    // send the message by socket io
     const handleOnSubmit = (e) => {
         e.preventDefault();
 
@@ -25,11 +27,14 @@ const ChatSection = ({ setMessages, setMessage, message, messages }) => {
         }
     };
 
+    // scroll to the bottom for every new message
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    //check when a message comes and scroll it it's needed
     useEffect(scrollToBottom, [messages]);
+
     return (
         <MainDiv>
             <ChatDiv>

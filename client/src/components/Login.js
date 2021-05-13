@@ -14,6 +14,7 @@ const Login = () => {
         setName(e.target.value);
     };
 
+    // login and save user
     const handleOnSubmit = (e) => {
         e.preventDefault();
         if (!name) {

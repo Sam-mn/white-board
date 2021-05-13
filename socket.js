@@ -22,6 +22,7 @@ module.exports = function (socket) {
         })
     );
 
+    // join room
     socket.on("join", ({ name, roomName }, callback) => {
         const user = addUser({
             id: socket.id,
@@ -31,11 +32,12 @@ module.exports = function (socket) {
 
         if (user.error) return callback("error");
 
+        // send message when user joining it
         socket.emit("message", {
             user: "admin",
             text: `Hello ${user.name} Welcome to the room ${user.room}`,
         });
-
+        // send message when a new user joining it
         socket.broadcast.to(user.room).emit("message", {
             user: "admin",
             text: `${user.name} has joined`,
@@ -43,23 +45,22 @@ module.exports = function (socket) {
 
         socket.join(user.room);
 
+        // check if the room is exist
         const existingRoom = rooms.find((room) => room.name === user.room);
 
         if (!existingRoom) {
             rooms.push({ name: user.room, users: {} });
         }
 
-        // send the updated waiting list to all other users in the room
-        socket.broadcast.to(user.room).emit("updated-waiting-list", {
-            users: getUserInRoom(user.room),
-        });
-
-        // send the updated waiting list to all other users in the room
+        // update rooms
         io.emit("updated-rooms", {
             rooms,
         });
 
+        // get online users
         io.to(user.room).emit("getOnlineUser", { users: getUserInRoom() });
+
+        // save a new room to the db
         db.collection("rooms")
             .doc(user.room)
             .get()
@@ -81,6 +82,7 @@ module.exports = function (socket) {
         });
     });
 
+    // send message
     socket.on("sendMessage", (message, callback) => {
         const user = getUser(socket.id);
 
@@ -90,6 +92,7 @@ module.exports = function (socket) {
 
     io.emit("roomList", { rooms });
 
+    // get the users in the room
     socket.on("getUsers", (data, callback) => {
         const users = getUserInRoom(data.room);
         if (!users.length > 0) {
@@ -110,11 +113,13 @@ module.exports = function (socket) {
         }
     });
 
+    // send canvas data to the users
     socket.on("canvas-data", (data) => {
         db.collection("rooms").doc(data.room).update({ drawing: data.data });
         socket.broadcast.to(data.room).emit("canvas-data", data.data);
     });
 
+    // leave the room and check if there are users, if not delete the room and the room data from db
     socket.on("leave-room", (data) => {
         console.log(
             `User with socketId ${socket.id} wants to leave ${data.room}`
@@ -129,12 +134,14 @@ module.exports = function (socket) {
         }
     });
 
+    // delete room
     socket.on("delete-room", (data) => {
         const updatedRooms = rooms.filter((d) => d.name !== data.room);
         rooms = updatedRooms;
         io.emit("roomList", { rooms });
     });
 
+    // get the canvas data from db for the new users
     socket.on("get-existing-data", (data, callback) => {
         db.collection("rooms")
             .doc(data.room)
