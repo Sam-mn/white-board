@@ -1,2 +1,2 @@
-# white-board-examensarbete
+# white-board
 https://a-digital-whiteboard.herokuapp.com/
